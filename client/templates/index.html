@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>LyeChat</title>
+<script src="{{url_for('static', filename='Connection.js')}}"></script>
+<script src="{{url_for('static', filename='main.js')}}"></script>
+<script src="{{url_for('static', filename='Message.js')}}"></script>
+<script src="{{url_for('static', filename='Update.js')}}"></script>
+
+<style>
+
+body {
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  overflow:hidden;
+  
+  color:#D8DEE9;
+}
+
+.chat-container {
+  background-color:#D8DEE9;  
+  border-radius: 10px;
+  padding: 20px;
+  height:85vh;
+  width: 100vw;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  position:absolute;
+  bottom:0;
+}
+
+.chat-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.chat-header h2 {
+  font-weight: bold;
+  margin: 0;
+  color:black;
+}
+
+.chat-messages {
+  height: 300px;
+  overflow-y: scroll;
+  overflow-x:hidden;
+}
+
+.chat-message {
+  margin-bottom: 10px;
+  border-radius: 20px;
+  max-width: 80%;
+  width:fit-content;
+  padding:10px; 
+  background-color: #434C5E;
+  margin-left:30px;
+}
+
+.chat-message.self {
+    margin-left:0px;
+    margin-right:30px;
+    background-color: #434C5E;
+  
+}
+
+.chat-message-container{
+    width:100%;
+}
+
+.chat-message-container-self{
+    display:flex;
+    justify-content: right;
+}
+
+.chat-input-container {
+  padding: 30px;
+  width:100%;
+  border-top:2px #434C5E solid;
+  display:flex;
+  margin-top:30px;
+}
+
+.chat-input{
+    width:70%;
+    height:100%;
+    font-size: 16px;
+    background-color: #ECEFF4;
+    border:none;
+    border-radius: 10px;
+    padding:15px;
+}
+
+.tabs{
+    display:flex;
+    justify-content: left;
+    position:absolute;
+    top:0;
+    height:10vh;
+    width:100%;
+    align-items: end;
+}
+.tab{
+    padding:10px;
+    text-align: center;
+    background-color: #ECEFF4;
+    color:#2E3440;
+    display:flex;
+    flex-direction: column;
+    margin-right:5px;
+    border-radius: 10px;
+    justify-content: center;
+    height:5vh;
+}
+
+.tab-selected{
+    background-color: #2E3440;
+    color:#ECEFF4;
+}
+.signin{
+    position: absolute;
+    padding:50px;
+    z-index:1;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color:black;
+}
+.placeholder{
+    border:1px black solid;
+    height:100%;
+    padding: 15px;
+    color:black;
+    border-radius: 10px;
+    margin-left: 15px;
+    
+}
+</style>
+</head>
+<body>
+<div class="signin">
+    <p>Enter your Discord user token [how?]</p>
+    <input type="text" placeholder="token" id="tk">
+    <p>Enter your Discord username</p>
+    <input type="text" placeholder="username" id="un">
+    <p></p>
+    <button onclick="connect()">Ok</button>
+</div>
+
+
+<div class="tabs">
+    <div class="tab tab-selected">
+        Messages
+    </div>
+    <div class="tab-spacer"></div>
+    <div class="tab">
+        Server 1
+    </div>
+    <div class="tab">
+        Server 1
+    </div>
+    <div class="tab">
+        Server 1
+    </div>
+    <div class="tab">
+        Server 1
+    </div>
+    <div class="tab">
+        Server 1
+    </div>
+</div>
+<div class="chat-container">
+  <div class="chat-header">
+    <h2>Chat</h2>
+  </div>
+
+  <div class="chat-messages">
+    <div class="chat-message-container">
+        <div class="chat-message">Hi there! How can I help you today?</div>
+    </div>
+    <div class="chat-message-container-self">
+        <div class="chat-message self">I'm looking for information on your products.</div>
+    </div>
+
+    <div class="chat-message-container">
+        <div class="chat-message">Example response message.</div>
+    </div>
+
+  <div class="chat-input-container">
+    <input type="text" class="chat-input" placeholder="Type your message here" id="messageBar">
+    <div class="placeholder">></div>
+    <div class="placeholder">gif</div>
+    <div class="placeholder">emoji</div>
+  </div>
+</div>
+
+</body>
+</html>
