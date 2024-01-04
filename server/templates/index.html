@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>LyeChat</title>
+<title>nwvbug Chats</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 <script src="{{url_for('static', filename='Connection.js')}}"></script>
-<script src="{{url_for('static', filename='main.js')}}"></script>
-<script src="{{url_for('static', filename='Message.js')}}"></script>
-<script src="{{url_for('static', filename='Update.js')}}"></script>
 
 <style>
 
@@ -28,7 +26,7 @@ body {
   padding: 20px;
   height:85vh;
   width: 100vw;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
   position:absolute;
   bottom:0;
 }
@@ -82,6 +80,8 @@ body {
   border-top:2px #434C5E solid;
   display:flex;
   margin-top:30px;
+  position:absolute;
+  bottom:0;
 }
 
 .chat-input{
@@ -95,6 +95,7 @@ body {
 }
 
 .tabs{
+    padding-left:30px;
     display:flex;
     justify-content: left;
     position:absolute;
@@ -126,7 +127,7 @@ body {
     z-index:1;
     background-color: white;
     border-radius: 20px;
-    box-shadow: black;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     justify-content: center;

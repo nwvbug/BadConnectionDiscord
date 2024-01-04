@@ -1,3 +1,12 @@
+var connection;
+var socket = io.connect("http://192.168.86.30:5000");
+socket.on("connecting", function() {
+    console.log("Server reached & handshake successful.")
+});
+socket.on('connect', function() {
+    socket.emit('connecting', 'connection established');
+});
+
 class Connection{
 
     constructor(selftoken, uname){
@@ -7,7 +16,7 @@ class Connection{
     }
 
     establish(){
-        this.websocket = new WebSocket("ws://localhost:8765")
+        
         let onConnection = {
             "intents":"startup",
             "message":null,
@@ -15,14 +24,10 @@ class Connection{
             "discordtoken":this.selftoken,
             "username":this.username
         }
-       this.websocket.addEventListener("open", (event) => {
-           this.websocket.send(JSON.stringify(onConnection));
-        })
-       this.websocket.addEventListener("message", (event) => {
-            console.log("Message from server.");
-            this.processMessage(event);
-
-        })
+        socket.emit("json", JSON.stringify(onConnection))
+        socket.on("json", function(data){
+            processMessage(data)
+        });
         
     }
 
@@ -32,11 +37,8 @@ class Connection{
         if (parsed.intents == "message"){
             messageRecieved(parsed);
         } else if (parsed.intents == "startup"){
-            if (parsed.message == "Connected to Lye"){
-                console.log("Connection to Lye Successful");
-            } else if (parsed.message == "Connected to Discord"){
-                console.log("Lye proxy connected to Discord Successfully");
-            }
+            console.log("User setup complete. NWVBUG Session Active.");
+            
         } else if (parsed.intents == "error"){
             console.error("Something went wrong.");
         } else {
@@ -52,7 +54,7 @@ class Connection{
             "discordtoken":this.selftoken,
             "username":this.username
         }
-        this.websocket.send(formattedMessage)
+        socket.send("json", formattedMessage, json=true)
     }
 
 

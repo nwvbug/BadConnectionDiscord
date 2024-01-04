@@ -2,12 +2,12 @@ import discord
 import json
 class MyClient(discord.Client):
 
-    def __init__(self, socket, token, uname, *args, **kwargs):
-        self.socket = socket
+    def setVars(self, socketID, token, uname, socketio):
+        self.socketID = socketID
         self.token = token
         self.username = uname
+        self.socketio = socketio
         print("Registering user "+uname)
-        super().__init__(*args, **kwargs)
 
     async def on_ready(self):
         print("Logged on as "+self.user)
@@ -22,8 +22,11 @@ class MyClient(discord.Client):
         new_contents = message.content
         dataToSend = {
             "intents":"message",
-            "message":message.content,
-            "channel":message.channel.id
+            "message":new_contents,
+            "channel":message.channel.id,
+            "author":name
         }
-        self.socket.send(json.dumps(dataToSend))
+        self.socketio.emit(dataToSend, json=True)
+
+        
         
