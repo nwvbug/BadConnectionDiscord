@@ -17,6 +17,7 @@ class MyClient(discord.Client):
         self.updateClient()
 
     async def on_message(self, message):
+        print("\n\n-------NEW MESSAGE BREAK: DISCORD SERVER MESSAGE ------ \n\n")
         print("Message recieved for user "+self.username)
         if message.author == self.user:
             return
@@ -27,7 +28,7 @@ class MyClient(discord.Client):
         new_contents = message.content
         dataToSend = {
             "intents":"message",
-            "message":new_contents,
+            "content":new_contents,
             "channel":message.channel.id,
             "author":name
         }

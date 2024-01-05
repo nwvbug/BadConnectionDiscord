@@ -1,5 +1,6 @@
 var connection;
 var socket = io.connect("http://192.168.86.30:5000");
+var currentDm = "";
 socket.on("starting_up", function() {
     console.log("Server reached & handshake successful.")
     console.log("Awaiting user credentials")
@@ -53,6 +54,7 @@ function processMessage(message){
             messageRecieved(message);
         } else if (message.intents == "startup"){
             console.log("User setup complete. NWVBUG Session Active.");
+            document.getElementById("loadingdesc").innerText = "Authenticating your Discord account..."
         } else if (message.intents == "error"){
             console.error("Something went wrong.");
         } else if (message.intents == "init_client"){
@@ -64,14 +66,45 @@ function processMessage(message){
         }
 }
 
+function messageRecieved(message){
+    console.log("Recieved Message from "+message.author.split("#")[0])
+    if (message.author.split("#")[0] == currentDm){
+        toAppend = `
+                <div class="chat-message-container" data-id="${message.id}">
+                    <div class="author">${message.author.split("#")[0]}</div>
+                    <div class="chat-message">${message.content}</div>
+                </div>    
+            `
+        document.getElementById("messageBox").innerHTML += toAppend;
+        document.getElementById("messageBox").scrollTo(0, document.getElementById("messageBox").scrollHeight);
+
+    } else {
+        console.log("receieved from "+message.author.split("#")[0]+" but user is on "+currentDm)
+    }
+}
+
+function prepMessage(){
+    sendMessage(document.getElementById("messageBar").value, currentDm)
+    document.getElementById("messageBar").value = "";
+    
+
+}
+
 function sendMessage(message, to){
-        let formattedMessage = {
-            "intents":"message",
-            "message":message,
-            "to":to,
-            "username":connection.username
-        }
-        socket.emit("json", JSON.stringify(formattedMessage))
+    let formattedMessage = {
+        "intents":"message",
+        "message":message,
+        "to":to,
+        "username":connection.username
+    }
+    socket.emit("json", JSON.stringify(formattedMessage))
+    toAppend = `
+        <div class="chat-message-container-self" data-id="">
+            <div class="chat-message self">${message}</div>
+        </div>    
+    `
+    document.getElementById("messageBox").innerHTML += toAppend;
+    document.getElementById("messageBox").scrollTo(0, document.getElementById("messageBox").scrollHeight);
 }
 
 function hideCredentialsShowLoading(){
@@ -97,9 +130,13 @@ function populate(list){
 }
 
 function openDM(to){
+    currentDm = to;
+    document.getElementById("homescreen").style.display = "none";
+    document.getElementById("loader").style.display = "flex"
+    document.getElementById("loadingdesc").innerText = "Getting your messages with "+to
     elems = document.getElementsByClassName('tab')
-    for(elem in elems){
-        elem.className = "tab"
+    for(var i = 0; i<elems.length; i++){
+        elems[i].className = "tab"
     }
     document.getElementById(to).classList += " tab-selected"
     req = {
@@ -142,8 +179,10 @@ function displayDMs(list){
         }
         appendString = toAppend+appendString;
     }
+    appendString = `<div class="largerButton" style='margin-bottom:50px; text-align:center;'>Load more messages</div>` + appendString
     container.innerHTML += appendString;
     document.getElementById("inpt").style.display = "flex"
     container.scrollTo(0, container.scrollHeight);
-
+    document.getElementById("loader").style.display = "none"
+    document.getElementById("loadingdesc").innerText = "Loading"
 }

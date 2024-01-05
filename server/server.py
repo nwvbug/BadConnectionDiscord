@@ -20,7 +20,7 @@ def index():
 
 @socketio.on("json")
 def recieve(data): #incoming messages need NAME and INTENTS: name to send to correct user and intents to decide what to do w message
-    print("\n\n-------NEW MESSAGE BREAK ------ \n\n")
+    print("\n\n-------NEW MESSAGE BREAK: SOCKETIO CLIENT MESSAGE ------ \n\n")
     parsed = json.loads(data)
     intents = parsed["intents"]
     print("INTENTS: "+intents)

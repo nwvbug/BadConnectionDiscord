@@ -4,11 +4,11 @@
 <title>nwvbug Chats</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
 <script src="{{url_for('static', filename='Connection.js')}}"></script>
-
+<link rel="icon" href="{{url_for('static', filename='images/tabicon nwvbugchats.png')}}">
 <style>
-
+@import url('https://fonts.googleapis.com/css2?family=Jost:wght@300;400;700&display=swap');
 body {
-  font-family: sans-serif;
+  font-family: 'Jost', sans-serif;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -61,7 +61,7 @@ body {
 .chat-message.self {
     margin-left:0px;
     margin-right:30px;
-    background-color: #434C5E;
+    background-color: #2E3440;
   
 }
 
@@ -100,6 +100,7 @@ body {
     border:none;
     border-radius: 10px;
     padding:15px;
+    font-family: 'Jost', sans-serif
 }
 
 .tabs{
@@ -108,9 +109,13 @@ body {
     justify-content: left;
     position:absolute;
     top:0;
-    height:10vh;
+    height:12vh;
     width:100%;
-    align-items: end;
+    align-items: center;
+    z-index:1;
+    min-height:fit-content;
+    overflow-x:scroll;
+    overflow-y:hidden;
 }
 .tab{
     padding:10px;
@@ -142,20 +147,29 @@ body {
     justify-content: center;
     align-items: center;
     color:black;
+    font-size:20px;
 }
-.placeholder{
-    border:1px black solid;
-    height:100%;
+.largerButton{
+    border:2px solid #2e3440;
     padding: 15px;
-    color:black;
+    color:#2e3440;
     border-radius: 10px;
     margin-left: 15px;
-    
+    transition:0.5s;
+    cursor:pointer;
 }
+
+.largerButton:hover{
+  color: #ECEFF4;
+  background-color: #2E3440;
+  border:2px solid #ECEFF4;
+
+}
+
 .loader{
     z-index:2;
-    background-color: black;
-    opacity: 0.5;
+    background-color: #d8dee9;
+    
     pointer-events: all;
     position:absolute;
     text-align: center;
@@ -165,34 +179,93 @@ body {
     width:100vw;
     height:100vh;
     font-size:30px;
-    display:none;
+    display:flex;
+    flex-direction:column;
+    color:#2e3440;
 }
+
+.signin_input{
+  padding:10px;
+  font-family: 'Jost', sans-serif;
+  border-radius:10px;
+  width:60%;
+}
+
+.animationLoader{
+  animation: load 1.5s ease-in-out infinite;
+}
+
+
+@keyframes load{
+  0%{
+    opacity:0%
+  }
+  50%{
+    opacity:100%
+  }
+  100%{
+    opacity:0%
+  }
+}
+
+.homescreen{
+  height:100vh;
+  width:100vw;
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position:absolute;
+  text-align: center;
+}
+.loginImage{
+  width:400px;
+}
+
+
+@media (max-width:1050px) {
+  #extras{
+    display:none;
+  }
+}
+
+
 
 </style>
 </head>
 <body>
+<div class="homescreen" id="homescreen">
+  <img src="{{url_for('static', filename='images/lockup-nobg.png')}}" style="width:60%; opacity:0.2; z-index:2;">
+  <div style="width:100%; font-size:20px;text-align: center; color:#2E3440;">Help | What's New | About</div>
+</div>
 <div class="loader" id="loader">
-    Loading... 
+    <img src="{{url_for('static', filename='images/darknwvbugchatsicon.svg')}}" style="height:200px;" class="animationLoader">
+    <div id="loadingdesc">Connecting to nwvbug servers...</div>
 </div>
-<div class="signin" id="signinContainer">
+<div style="width:100vw; height:100vh; background-color: #d8dee9; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index:2;" id="signinContainer">
+  <div class="signin">
+    <img src="{{url_for('static', filename='images/lockup-nobg.png')}}" class="loginImage">
     <p>Enter your Discord user token [how?]</p>
-    <input type="text" placeholder="token" id="tk">
+    <input type="text" placeholder="token" id="tk" class="signin_input">
     <p>Enter your Discord username</p>
-    <input type="text" placeholder="username" id="un">
+    <input type="text" placeholder="username" id="un" class="signin_input">
     <p></p>
-    <button onclick="connect()">Ok</button>
+    <div class="largerButton" onclick="connect()">Log In</div>
+  </div>
 </div>
 
 
-<div class="tabs" id="tabs">
-    
-</div>
+
+  <div class="tabs" id="tabs">
+
+  </div>
+  
+
 <div class="chat-container">
 
 
   <div class="chat-messages" id="messageBox">
-    <div style="width:100%; font-size:30px; font-weight:bold; text-align: center; color:black; display:none;" id="instructions">Select a DM.</div>
-    
+    <div style="width:100%; font-size:30px; font-weight:bold; text-align: center; color:#2E3440; display:none;" id="instructions">Select a DM.</div>
     <!-- <div class="chat-message-container">
       <div class="author">anklebowl</div>
         <div class="chat-message">Hi there! How can I help you today?</div>
@@ -206,10 +279,12 @@ body {
     </div> -->
   </div>
   <div class="chat-input-container" style="display:none;" id="inpt">
-    <input type="text" class="chat-input" placeholder="Type your message here" id="messageBar">
-    <div class="placeholder">></div>
-    <div class="placeholder">gif</div>
-    <div class="placeholder">emoji</div>
+    <input type="text" class="chat-input" placeholder="Type your message here" id="messageBar" style="flex:0.9;">
+    <div style="display:flex;" id="extras">
+      <div class="largerButton" onclick="prepMessage()">></div>
+      <div class="largerButton">gif</div>
+      <div class="largerButton">emoji</div>
+    </div>
   </div>
 </div>
 
