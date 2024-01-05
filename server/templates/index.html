@@ -43,7 +43,7 @@ body {
 }
 
 .chat-messages {
-  height: 300px;
+  height:70vh;
   overflow-y: scroll;
   overflow-x:hidden;
 }
@@ -73,6 +73,14 @@ body {
     display:flex;
     justify-content: right;
 }
+
+.author{
+  color:#434C5E;
+  margin-left:35px;
+  margin-bottom:5px;
+}
+
+
 
 .chat-input-container {
   padding: 30px;
@@ -115,6 +123,7 @@ body {
     border-radius: 10px;
     justify-content: center;
     height:5vh;
+    cursor:pointer;
 }
 
 .tab-selected{
@@ -143,10 +152,29 @@ body {
     margin-left: 15px;
     
 }
+.loader{
+    z-index:2;
+    background-color: black;
+    opacity: 0.5;
+    pointer-events: all;
+    position:absolute;
+    text-align: center;
+    font-weight: bold;
+    align-items: center;
+    justify-content: center;
+    width:100vw;
+    height:100vh;
+    font-size:30px;
+    display:none;
+}
+
 </style>
 </head>
 <body>
-<div class="signin">
+<div class="loader" id="loader">
+    Loading... 
+</div>
+<div class="signin" id="signinContainer">
     <p>Enter your Discord user token [how?]</p>
     <input type="text" placeholder="token" id="tk">
     <p>Enter your Discord username</p>
@@ -156,34 +184,17 @@ body {
 </div>
 
 
-<div class="tabs">
-    <div class="tab tab-selected">
-        Messages
-    </div>
-    <div class="tab-spacer"></div>
-    <div class="tab">
-        Server 1
-    </div>
-    <div class="tab">
-        Server 1
-    </div>
-    <div class="tab">
-        Server 1
-    </div>
-    <div class="tab">
-        Server 1
-    </div>
-    <div class="tab">
-        Server 1
-    </div>
+<div class="tabs" id="tabs">
+    
 </div>
 <div class="chat-container">
-  <div class="chat-header">
-    <h2>Chat</h2>
-  </div>
 
-  <div class="chat-messages">
-    <div class="chat-message-container">
+
+  <div class="chat-messages" id="messageBox">
+    <div style="width:100%; font-size:30px; font-weight:bold; text-align: center; color:black; display:none;" id="instructions">Select a DM.</div>
+    
+    <!-- <div class="chat-message-container">
+      <div class="author">anklebowl</div>
         <div class="chat-message">Hi there! How can I help you today?</div>
     </div>
     <div class="chat-message-container-self">
@@ -192,9 +203,9 @@ body {
 
     <div class="chat-message-container">
         <div class="chat-message">Example response message.</div>
-    </div>
-
-  <div class="chat-input-container">
+    </div> -->
+  </div>
+  <div class="chat-input-container" style="display:none;" id="inpt">
     <input type="text" class="chat-input" placeholder="Type your message here" id="messageBar">
     <div class="placeholder">></div>
     <div class="placeholder">gif</div>
