@@ -1,11 +1,5 @@
-a way to use discord when your connection is bad. Local UI in html/css, running on flask python server
-
-client -> intermediary server -> discord
-
-connection between client and intermediary intends to have less overhead than the connection between a discord client and the discord servers.
-
-
-server deps: pip packages: "websockets" "discord.py-self"
-
-client deps: pip packages: ~~"websockets"~~ "Flask"
-built on python 3.11
+a way to use discord when your connection is bad.
+Webapp hosted on intermediary server that selectively makes discord packets smaller.
+Client and server use clever localstorage syncronization and tricks to prevent unnecessary loading.
+Server packages: discord.py-self, flask, flask-socketio, flask-cors, threading, asyncio
+Client packages: None! just go to the site (not yet public) 
