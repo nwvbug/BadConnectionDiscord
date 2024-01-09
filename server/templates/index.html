@@ -233,7 +233,7 @@ body {
 
 </style>
 </head>
-<body>
+<body onload="checkIfUsed()">
 <div class="homescreen" id="homescreen">
   <img src="{{url_for('static', filename='images/lockup-nobg.png')}}" style="width:60%; opacity:0.2; z-index:2;">
   <div style="width:100%; font-size:20px;text-align: center; color:#2E3440;">Help | What's New | About</div>
@@ -243,14 +243,14 @@ body {
     <div id="loadingdesc">Connecting to nwvbug servers...</div>
 </div>
 <div style="width:100vw; height:100vh; background-color: #d8dee9; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index:2;" id="signinContainer">
-  <div class="signin">
+  <div class="signin" id="signinwindow">
     <img src="{{url_for('static', filename='images/lockup-nobg.png')}}" class="loginImage">
-    <p>Enter your Discord user token [how?]</p>
-    <input type="text" placeholder="token" id="tk" class="signin_input">
-    <p>Enter your Discord username</p>
-    <input type="text" placeholder="username" id="un" class="signin_input">
-    <p></p>
-    <div class="largerButton" onclick="connect()">Log In</div>
+    <p class="normalLogin" id="tokenDirections" style="max-width:400px; text-align: center;">Enter your Discord user token [how?]</p>
+    <input type="text" placeholder="token" id="tk" class="signin_input normalLogin">
+    <div class="largerButton normalLogin" onclick="connect()" style="margin-top:10px;">Log In</div> 
+    <div style="font-weight:bold; margin-bottom:20px; margin-top:20px; display:none;" class="altLogin">Click your name to log in</div>
+    <div style="padding:10px; background-color: #2E3440; color:#D8DEE9; border-radius: 10px; margin-bottom:10px; cursor:pointer; display:none;" class="altLogin" onclick='connect("ovr")' id="altName">Oops, this shouldn't be here.</div>
+    <div style="padding:10px; background-color: #ECEFF4; color:#2E3440; border-radius: 10px; cursor:pointer; display:none;" class="altLogin" onclick="switchUser()">Log in as someone else</div>
   </div>
 </div>
 

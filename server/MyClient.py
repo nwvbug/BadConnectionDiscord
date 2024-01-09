@@ -5,23 +5,30 @@ import requests
 import random
 class MyClient(discord.Client):
 
-    def setVars(self, socketID, token, uname, socketio):
+    def setVars(self, socketID, socketio, token=None):
         self.socketID = socketID
-        self.token = token
-        self.username = uname
+        if (token != None):
+            self.token = token
+        
         self.socketio = socketio
-        print("Registering user "+uname)
+        print("Registering user "+self.token+" with a socket connection of "+socketID)
 
     async def on_ready(self):
-        print("Logged on as "+self.user.name)
-        self.updateClient()
+        print("Logged on as "+self.user.name) #this goofy shit doesnt work like half the time
+        if self.is_ready():
+            self.updateClient()
 
     async def on_message(self, message):
-        print("\n\n-------NEW MESSAGE BREAK: DISCORD SERVER MESSAGE ------ \n\n")
-        print("Message recieved for user "+self.username)
-        if message.author == self.user:
+        if not self.is_ready(): #when not readyt DONT RUN THE CODE 
             return
-        if message.author.dm_channel.id != message.channel.id:
+        #print("\n\n-------NEW MESSAGE BREAK: DISCORD SERVER MESSAGE ------ \n\n")
+        #print("Message recieved for user "+self.username)
+        if message.author == self.user: #dont reply to yourself bruh
+            return
+        try:
+            if message.author.dm_channel.id != message.channel.id:
+                return
+        except:
             return
         
         name = str(message.author)
@@ -32,16 +39,16 @@ class MyClient(discord.Client):
             "channel":message.channel.id,
             "author":name
         }
-        self.socketio.send(dataToSend, json=True)
+        self.socketio.send(dataToSend, json=True, room=self.socketID)
 
     def getDmList(self):
         dmsList = {}
         self.channelList = {}
         count = 0
-        for user in self.user.friends:
-            if (user.dm_channel != None):
-                dmsList[count] = user.name
-                self.channelList[user.name] = user.dm_channel
+        for user in self.friends:
+            if (user.user.dm_channel != None):
+                dmsList[count] = user.user.name
+                self.channelList[user.user.name] = user.user.dm_channel
             count =  count+1
 
         return [dmsList, count]
@@ -55,9 +62,10 @@ class MyClient(discord.Client):
             "channel":None,
             "author":None,
             "dmsList":dmsList[0],
-            "dmsListLength":dmsList[1]
+            "dmsListLength":dmsList[1],
+            "username":self.user.name
         }
-        self.socketio.send(dataToSend, json=True)
+        self.socketio.send(dataToSend, json=True, room=self.socketID)
 
     def sendToDiscord(self, message, to):
         print("forwarding message to Discord...")

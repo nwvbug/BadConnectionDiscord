@@ -1,5 +1,5 @@
-var connection;
-var socket = io.connect("http://192.168.86.30:5000");
+var connection = null;
+var socket = io.connect(window.location.href);
 var currentDm = "";
 socket.on("starting_up", function() {
     console.log("Server reached & handshake successful.")
@@ -9,44 +9,112 @@ socket.on('connect', function() {
     console.log("Sending initial connect handshake to server")
     socket.emit('starting_up', 'connection established');
 });
+socket.on('reset_id', function(data) {
+    console.log("Server forced ID reset")
+    window.localStorage.setItem("user_id", null)
+    toRem = document.getElementsByClassName("normalLogin")
+    for (var i = 0; i<toRem.length; i++){
+        toRem[i].style.display=""
+    }
+    document.getElementById("signinContainer").style.display = "flex"
+    document.getElementById("loader").style.display = "none"
+    document.getElementById("instructions").style.display = "none"
+    document.getElementById("tokenDirections").innerText = "Your nwvbugFast sign-in has expired. Please re-enter your Discord token. This happens periodically."
+    toAdd = document.getElementsByClassName("altLogin")
+    for (var i = 0; i<toAdd.length; i++){
+        toAdd[i].style.display="none"
+    }
+})
 
+function checkIfUsed(){
+    if(window.localStorage.getItem("user_id") != null && window.localStorage.getItem("user_id") != ""){
+        toRem = document.getElementsByClassName("normalLogin")
+        for (var i = 0; i<toRem.length; i++){
+            toRem[i].style.display="none"
+        }
+        toAdd = document.getElementsByClassName("altLogin")
+        for (var i = 0; i<toAdd.length; i++){
+            toAdd[i].style.display=""
+        }
+        document.getElementById("altName").innerText = window.localStorage.getItem("username")
+    }
+}
+
+function switchUser(){
+    window.localStorage.setItem("user_id", null)
+    window.localStorage.setItem("username", null)
+    toRem = document.getElementsByClassName("normalLogin")
+    for (var i = 0; i<toRem.length; i++){
+        toRem[i].style.display=""
+    }
+    toAdd = document.getElementsByClassName("altLogin")
+    for (var i = 0; i<toAdd.length; i++){
+        toAdd[i].style.display="none"
+    }
+}
 
 class Connection{
 
-    constructor(selftoken, uname){
+    constructor(selftoken){
         this.selftoken = selftoken
-        this.username = uname
-        this.establish();
+        this.establish(true);
     }
 
-    establish(){
-        
-        let onConnection = {
-            "intents":"startup",
-            "message":null,
-            "channel":null,
-            "discordtoken":this.selftoken,
-            "username":this.username
+    establish(isNew){
+        let onConnection
+        if (window.localStorage.getItem("user_id") != null && window.localStorage.getItem("user_id") != "" && window.localStorage.getItem("user_id")!="null"){
+            console.log("user id is "+window.localStorage.getItem("user_id")+", so reconnecting")
+            onConnection = {
+                "intents":"startup",
+                "message":null,
+                "channel":null,
+                "discordtoken":this.selftoken,
+                "user_id":window.localStorage.getItem("user_id")
+            }
+        } else {
+            onConnection = {
+                "intents":"startup",
+                "message":null,
+                "channel":null,
+                "discordtoken":this.selftoken,
+            }
         }
         socket.emit("json", JSON.stringify(onConnection))
-        socket.on("json", function(data){
-            processMessage(data)
-        });
-        window.onbeforeunload = function (event) {
-            console.log("Sending logoff...")
-            socket.emit("logging_off", {"username":this.username})
+        if (isNew){
+            socket.on("json", function(data){
+                processMessage(data)
+            });
+            window.onbeforeunload = function (event) {
+                console.log("Sending logoff...")
+                socket.emit("logging_off", {"username":this.user_id})
+            }
         }
         hideCredentialsShowLoading()
     }
 
+    updateInfo(tk){
+        this.selftoken = tk;
+    }
+
 }
 
-function connect(){
-    token = document.getElementById("tk").value;
-    username = document.getElementById("un").value;
-    //console.log("sending: "+token+" | "+username)
-    cn = new Connection(token, username);
-    connection = cn;
+function connect(str){
+    var token;
+    if (str == 'ovr'){
+        token = "NWVBUG OVERRIDE VIA USER_ID";
+    }
+    else {
+        token = document.getElementById("tk").value;
+        //console.log("sending: "+token+" | "+username)
+    }
+    if (connection != null){
+        connection.updateInfo(token)
+        connection.establish(false)
+    }
+    else {
+        cn = new Connection(token);
+        connection = cn;
+    }
 }
 
 function processMessage(message){
@@ -54,10 +122,19 @@ function processMessage(message){
             messageRecieved(message);
         } else if (message.intents == "startup"){
             console.log("User setup complete. NWVBUG Session Active.");
+            console.log("Storing user id...")
+            window.localStorage.setItem("user_id", message.user_id)
+            connection.user_id = message.user_id
             document.getElementById("loadingdesc").innerText = "Authenticating your Discord account..."
         } else if (message.intents == "error"){
             console.error("Something went wrong.");
         } else if (message.intents == "init_client"){
+            var wage = document.getElementById("messageBar");
+            wage.addEventListener("keydown", function (e) {
+                if (e.code === "Enter") {  //checks whether the pressed key is "Enter"
+                    prepMessage()
+                }
+            });
             console.log("Discord authentication complete. Discord Session Active.")
             
             populate(message)
@@ -95,7 +172,8 @@ function sendMessage(message, to){
         "intents":"message",
         "message":message,
         "to":to,
-        "username":connection.username
+        "username":connection.username,
+        "user_id":connection.user_id
     }
     socket.emit("json", JSON.stringify(formattedMessage))
     toAppend = `
@@ -108,6 +186,7 @@ function sendMessage(message, to){
 }
 
 function hideCredentialsShowLoading(){
+    console.log("hiding sign in screen")
     document.getElementById("signinContainer").style.display = "none"
     document.getElementById("loader").style.display = "flex"
     document.getElementById("instructions").style.display = ""
@@ -115,6 +194,8 @@ function hideCredentialsShowLoading(){
 
 function populate(list){
     parent = document.getElementById("tabs")
+    connection.username = list.username
+    window.localStorage.setItem("username", connection.username)
     console.log(list.dmsList)
     toAppend = ""
     for (var i = 0; i<list.dmsListLength; i++){
@@ -141,7 +222,7 @@ function openDM(to){
     document.getElementById(to).classList += " tab-selected"
     req = {
         "intents":"openDM",
-        "username":connection.username,
+        "user_id":connection.user_id,
         "to":to
     }
     socket.on("openDM", function(data){
