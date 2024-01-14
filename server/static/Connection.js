@@ -147,11 +147,19 @@ function messageRecieved(message){
     console.log("Recieved Message from "+message.author.split("#")[0])
     if (message.author.split("#")[0] == currentDm){
         toAppend = `
-                <div class="chat-message-container" data-id="${message.id}">
-                    <div class="author">${message.author.split("#")[0]}</div>
-                    <div class="chat-message">${message.content}</div>
-                </div>    
+            <div class="chat-message-container" data-id="${message.id}">
+                <div class="author">${message.author}</div>
+                <div class="chat-message">${message.content}
+                
+        `
+        if (message.hasOwnProperty("images")){
+            for (var j = 0; j<message.images.length; j++){
+                toAppend = toAppend + `
+                <img src='${message.images[j].url}' style='max-width:25vw; max-height:400px; border-radius:10px;'>
             `
+            }
+        }
+        toAppend = toAppend + "</div></div>"
         document.getElementById("messageBox").innerHTML += toAppend;
         document.getElementById("messageBox").scrollTo(0, document.getElementById("messageBox").scrollHeight);
 
@@ -241,23 +249,38 @@ function displayDMs(list){
     for (var i = 0; i<list.length; i++){
         message = list[i]
         var toAppend;
-        if (message.content == ""){
-            message.content = "[image]"
-        }
+        console.log(message)
+        
         if (message.author == connection.username){
             toAppend = `
                 <div class="chat-message-container-self" data-id="${message.id}">
-                    <div class="chat-message self">${message.content}</div>
-                </div>    
+                    <div class="chat-message self">${message.content}
+                   
             `
+            if (message.hasOwnProperty("images")){
+                for (var j = 0; j<message.images.length; j++){
+                    toAppend = toAppend + `
+                    <img src='${message.images[j].url}' style='max-width:25vw; max-height:400px; border-radius:10px;'>
+                `
+                }
+            }
+            
         } else {
             toAppend = `
                 <div class="chat-message-container" data-id="${message.id}">
                     <div class="author">${message.author}</div>
-                    <div class="chat-message">${message.content}</div>
-                </div>    
+                    <div class="chat-message">${message.content}
+                   
             `
+            if (message.hasOwnProperty("images")){
+                for (var j = 0; j<message.images.length; j++){
+                    toAppend = toAppend + `
+                    <img src='${message.images[j].url}' style='max-width:25vw; max-height:400px; border-radius:10px;'>
+                `
+                }
+            }
         }
+        toAppend = toAppend + "</div></div>"
         appendString = toAppend+appendString;
     }
     appendString = `<div class="largerButton" style='margin-bottom:50px; text-align:center;'>Load more messages</div>` + appendString

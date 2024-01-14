@@ -18,7 +18,7 @@ class MyClient(discord.Client):
         if self.is_ready():
             self.updateClient()
 
-    async def on_message(self, message):
+    async def on_message(self, message):    
         if not self.is_ready(): #when not readyt DONT RUN THE CODE 
             return
         #print("\n\n-------NEW MESSAGE BREAK: DISCORD SERVER MESSAGE ------ \n\n")
@@ -34,11 +34,19 @@ class MyClient(discord.Client):
         name = str(message.author)
         new_contents = message.content
         dataToSend = {
-            "intents":"message",
+            "author":name,
             "content":new_contents,
-            "channel":message.channel.id,
-            "author":name
+            "id":message.id,
+            "timestamp":str(message.created_at),
+            "intents":"message"
         }
+            
+        if len(message.attachments) > 0:   
+            lst = list()
+            for item in message.attachments:
+                lst.append({"url":item.url})
+
+            dataToSend["images"] = lst
         self.socketio.send(dataToSend, json=True, room=self.socketID)
 
     def getDmList(self):

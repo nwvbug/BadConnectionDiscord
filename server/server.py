@@ -69,7 +69,8 @@ def recieve(data): #incoming messages need NAME and INTENTS: name to send to cor
                 "id":message["id"],
                 "timestamp":message["timestamp"]
             }
-            if message["content"] == "":   
+            
+            if len(message["attachments"]) > 0:   
                 newMsg["images"] = message["attachments"]
             returned.append(newMsg)
         socketio.emit("openDM", returned, room=request.sid)
