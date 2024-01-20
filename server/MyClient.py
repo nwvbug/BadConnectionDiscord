@@ -18,6 +18,17 @@ class MyClient(discord.Client):
         if self.is_ready():
             self.updateClient()
 
+    async def on_typing(self, channel, user, when):
+        if not self.is_ready(): #when not readyt DONT RUN THE CODE 
+            return
+        try:
+            if channel != user.dm_channel.id:
+                return
+        except:
+            return
+        return
+
+
     async def on_message(self, message):    
         if not self.is_ready(): #when not readyt DONT RUN THE CODE 
             return
@@ -95,6 +106,18 @@ class MyClient(discord.Client):
 
     def getRecents(self, to):
         url = "https://discord.com/api/v9/channels/"+str(self.channelList[to].id)+"/messages?limit=15"
+        req = requests.get(url=url, headers={
+            "Authorization":self.token, 
+            "Content-Type":"application/json",
+            "Origin":"https://discord.com",
+            "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Connection":"keep-alive"
+            })
+        print("status code "+str(req.status_code))
+        return req.text
+    
+    def getMore(self, to, lim):
+        url = "https://discord.com/api/v9/channels/"+str(self.channelList[to].id)+"/messages?limit="+lim
         req = requests.get(url=url, headers={
             "Authorization":self.token, 
             "Content-Type":"application/json",

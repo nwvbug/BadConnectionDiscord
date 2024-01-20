@@ -17,7 +17,7 @@ socket.on('reset_id', function(data) {
         toRem[i].style.display=""
     }
     document.getElementById("signinContainer").style.display = "flex"
-    document.getElementById("loader").style.display = "none"
+    loadingOff()
     document.getElementById("instructions").style.display = "none"
     document.getElementById("tokenDirections").innerText = "Your nwvbugFast sign-in has expired. Please re-enter your Discord token. This happens periodically."
     toAdd = document.getElementsByClassName("altLogin")
@@ -125,7 +125,6 @@ function processMessage(message){
             console.log("Storing user id...")
             window.localStorage.setItem("user_id", message.user_id)
             connection.user_id = message.user_id
-            document.getElementById("loadingdesc").innerText = "Authenticating your Discord account..."
         } else if (message.intents == "error"){
             console.error("Something went wrong.");
         } else if (message.intents == "init_client"){
@@ -146,12 +145,24 @@ function processMessage(message){
 function messageRecieved(message){
     console.log("Recieved Message from "+message.author.split("#")[0])
     if (message.author.split("#")[0] == currentDm){
-        toAppend = `
+        list = document.getElementById("messageBox").children;
+        prev = list[list.length-1];
+        var toAppend;
+        if (prev.className == "chat-message-container-self"){
+            toAppend = `
             <div class="chat-message-container" data-id="${message.id}">
-                <div class="author">${message.author}</div>
                 <div class="chat-message">${message.content}
-                
-        `
+            `
+        }
+        else {
+            toAppend = `
+            <div class="chat-message-container" data-id="">
+                <div class="chat-message" style='border-radius: 5px 20px 20px 20px'>${message.content}
+            `
+            prev.children[0].style.borderBottomLeftRadius = "5px"
+            prev.children[0].style.marginBottom = "2px"
+        }
+        
         if (message.hasOwnProperty("images")){
             for (var j = 0; j<message.images.length; j++){
                 toAppend = toAppend + `
@@ -184,11 +195,26 @@ function sendMessage(message, to){
         "user_id":connection.user_id
     }
     socket.emit("json", JSON.stringify(formattedMessage))
-    toAppend = `
+    list = document.getElementById("messageBox").children;
+    prev = list[list.length-1];
+    var toAppend;
+    if (prev.className == "chat-message-container"){
+        toAppend = `
         <div class="chat-message-container-self" data-id="">
             <div class="chat-message self">${message}</div>
         </div>    
-    `
+        `
+    }
+    else {
+        toAppend = `
+        <div class="chat-message-container-self" data-id="">
+            <div class="chat-message self" style='border-radius: 20px 5px 20px 20px'>${message}</div>
+        </div>    
+        `
+        prev.children[0].style.borderBottomRightRadius = "5px"
+        prev.children[0].style.marginBottom = "2px"
+    }
+    
     document.getElementById("messageBox").innerHTML += toAppend;
     document.getElementById("messageBox").scrollTo(0, document.getElementById("messageBox").scrollHeight);
 }
@@ -196,7 +222,7 @@ function sendMessage(message, to){
 function hideCredentialsShowLoading(){
     console.log("hiding sign in screen")
     document.getElementById("signinContainer").style.display = "none"
-    document.getElementById("loader").style.display = "flex"
+    loadingOn()
     document.getElementById("instructions").style.display = ""
 }
 
@@ -210,19 +236,19 @@ function populate(list){
         var html = `
         <div class="tab" id='${list.dmsList[i]}' onclick='openDM("${list.dmsList[i]}")'>
             ${list.dmsList[i]}
+            <div style='border-radius:100000px; background-color:red; width:10%; height:10%;'></div>
         </div>
         `
         toAppend = toAppend+html;
     }
     parent.innerHTML += toAppend;
-    document.getElementById("loader").style.display = "none"
+    loadingOff()
 }
 
 function openDM(to){
     currentDm = to;
     document.getElementById("homescreen").style.display = "none";
-    document.getElementById("loader").style.display = "flex"
-    document.getElementById("loadingdesc").innerText = "Getting your messages with "+to
+    loadingOn();
     elems = document.getElementsByClassName('tab')
     for(var i = 0; i<elems.length; i++){
         elems[i].className = "tab"
@@ -244,8 +270,8 @@ function openDM(to){
 function displayDMs(list){
     console.log(list);
     var container = document.getElementById("messageBox")
-    container.innerHTML = ""
-    var appendString;
+    container.innerHTML = null
+    var appendString = ""
     for (var i = 0; i<list.length; i++){
         message = list[i]
         var toAppend;
@@ -253,10 +279,26 @@ function displayDMs(list){
         
         if (message.author == connection.username){
             toAppend = `
-                <div class="chat-message-container-self" data-id="${message.id}">
-                    <div class="chat-message self">${message.content}
-                   
+                <div class="chat-message-container-self" data-id="${message.id}">        
             `
+            authorName = `<div class="author">${message.author}</div>`
+
+            if (i+1 < list.length && list[i+1].author == message.author){
+                if (i-1>=0 && list[i-1].author == message.author){
+                    toAppend = toAppend + `<div class="chat-message self" style='margin-bottom:2px; border-radius:20px 5px 5px 20px'>${message.content}`
+                }
+                else {
+                    toAppend = toAppend + `<div class="chat-message self" style=' border-radius:20px 5px 20px 20px'>${message.content}`
+                }
+            } else {
+                if (i-1>=0 && list[i-1].author == message.author){
+                    toAppend = toAppend + `<div class="chat-message self" style='margin-bottom:2px; border-radius:20px 20px 5px 20px'>${message.content}`
+                }
+                else {
+                    toAppend = toAppend + `<div class="chat-message self">${message.content}`
+                }
+
+            }
             if (message.hasOwnProperty("images")){
                 for (var j = 0; j<message.images.length; j++){
                     toAppend = toAppend + `
@@ -267,11 +309,26 @@ function displayDMs(list){
             
         } else {
             toAppend = `
-                <div class="chat-message-container" data-id="${message.id}">
-                    <div class="author">${message.author}</div>
-                    <div class="chat-message">${message.content}
-                   
+                <div class="chat-message-container" data-id="${message.id}">        
             `
+            authorName = `<div class="author">${message.author}</div>`
+
+            if (i+1 < list.length && list[i+1].author == message.author){
+                if (i-1>=0 && list[i-1].author == message.author){
+                    toAppend = toAppend + `<div class="chat-message" style='margin-bottom:2px; border-radius:5px 20px 20px 5px'>${message.content}`
+                }
+                else {
+                    toAppend = toAppend + `<div class="chat-message" style=' border-radius:5px 20px 20px 20px'>${message.content}`
+                }
+            } else {
+                if (i-1>=0 && list[i-1].author == message.author){
+                    toAppend = toAppend + authorName + `<div class="chat-message" style='margin-bottom:2px; border-radius:20px 20px 20px 5px'>${message.content}`
+                }
+                else {
+                    toAppend = toAppend + authorName + `<div class="chat-message">${message.content}`
+                }
+
+            }
             if (message.hasOwnProperty("images")){
                 for (var j = 0; j<message.images.length; j++){
                     toAppend = toAppend + `
@@ -287,6 +344,43 @@ function displayDMs(list){
     container.innerHTML += appendString;
     document.getElementById("inpt").style.display = "flex"
     container.scrollTo(0, container.scrollHeight);
-    document.getElementById("loader").style.display = "none"
-    document.getElementById("loadingdesc").innerText = "Loading"
+    loadingOff()
 }
+
+var loadingInterval;
+function loadingOn(){
+    document.getElementById("loader").style.display = "flex";
+    document.getElementById("loadingdesc").innerText = loadingSayings[parseInt(Math.random()*(loadingSayings.length-1))];
+    loadingInterval = setInterval(getLoadingSaying, 4000);
+}
+
+function loadingOff(){
+    clearInterval(loadingInterval)
+    document.getElementById("loader").style.display = "none";
+}
+
+function getLoadingSaying(){
+    document.getElementById("loadingdesc").setAttribute("class", "loader-fade");
+
+    setTimeout(() => {
+        document.getElementById("loadingdesc").innerText = loadingSayings[parseInt(Math.random()*(loadingSayings.length-1))];
+        document.getElementById("loadingdesc").setAttribute("class", "loader-show");
+    }, 500)
+}
+
+var loadingSayings = [
+    "Connecting you to other humans... or sentient toasters, whichever comes first.",
+    "Patience is a virtue, except when it comes to loading screens. In that case, it's a minor inconvenience.",
+    "Fetching your server... don't worry, we haven't lost it in the void... yet.",
+    "Did you know the average person spends 2 years of their life waiting for loading screens? Don't worry, we're working on reducing that. To zero. Eventually.",
+    "Taking a minute to load? Don't worry, that's just us perfecting your entrance music.",
+    "Your chat is almost here. Think of it as digital purgatory, but with better wi-fi.",
+    "Downloading server rules… Please read them. Just kidding, nobody does. But maybe you should?",
+    "Shuffling virtual chairs… don't worry, we always leave the comfy one for you.",
+    "Whistling to the server hamsters… they get cranky if they don't hear a tune.",
+    "If you hear whispering during this loading screen, it's just the servers having a philosophical debate about the nature of data. Don't judge, they're trying their best.",
+    "Loading... making sure the chat pixels are perfectly aligned.",
+    "Walking to Discord HQ",
+    "Folding your messages like origami masterpieces.",
+    "Launching the carrier pigeons"
+]

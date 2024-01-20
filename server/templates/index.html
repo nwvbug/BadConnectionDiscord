@@ -49,7 +49,7 @@ body {
 }
 
 .chat-message {
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   border-radius: 20px;
   max-width: 80%;
   width:fit-content;
@@ -58,13 +58,14 @@ body {
   margin-left:30px;
   display:flex;
   flex-direction: column;
+  transition:1s;
 }
 
 .chat-message.self {
     margin-left:0px;
     margin-right:30px;
     background-color: #2E3440;
-  
+    transition:1s;
 }
 
 .chat-message-container{
@@ -210,6 +211,18 @@ body {
   }
 }
 
+.loader-fade{
+  padding:30px;
+  opacity:0;
+  transition: all 0.5s ease;
+}
+
+.loader-show{
+  padding:30px;
+  opacity:1;
+  transition: all 0.5s ease;
+}
+
 .homescreen{
   height:100vh;
   width:100vw;
@@ -242,7 +255,7 @@ body {
 </div>
 <div class="loader" id="loader">
     <img src="{{url_for('static', filename='images/darknwvbugchatsicon.svg')}}" style="height:200px;" class="animationLoader">
-    <div id="loadingdesc">Connecting to nwvbug servers...</div>
+    <div id="loadingdesc" class="loader-show">Connecting to nwvbug servers...</div>
 </div>
 <div style="width:100vw; height:100vh; background-color: #d8dee9; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index:2;" id="signinContainer">
   <div class="signin" id="signinwindow">
@@ -257,10 +270,16 @@ body {
 </div>
 
 
-
-  <div class="tabs" id="tabs">
-
-  </div>
+    <div class="tabs" id="tabs">
+      <img src="{{url_for('static', filename='images/darknwvbugchatsicon.svg')}}" style="height:8vh; margin-right:5px;">
+      <div class="tab" id='${list.dmsList[i]}' onclick='openDM("${list.dmsList[i]}")' style="margin-right:10px;">
+        theyoungnanesh
+        <div style='border-radius:100000px; background-color:red; width:10%; height:10%;'></div>
+      </div>
+    </div>
+    
+  
+  
   
 
 <div class="chat-container">

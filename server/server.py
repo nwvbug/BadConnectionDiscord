@@ -75,6 +75,9 @@ def recieve(data): #incoming messages need NAME and INTENTS: name to send to cor
             returned.append(newMsg)
         socketio.emit("openDM", returned, room=request.sid)
 
+    if (intents == "getMore"):
+        more = clients[parsed["user_id"]].getMore(parsed["to"], parsed["lim"])
+
 def assignID(parsed, req):
     user_id = uuid.uuid3(uuid. NAMESPACE_DNS, parsed["discordtoken"]); #yippee personal identification ( key to the dict)
     print("user's nwvbug id is ", user_id)
