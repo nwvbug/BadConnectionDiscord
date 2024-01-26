@@ -67,11 +67,17 @@ def recieve(data): #incoming messages need NAME and INTENTS: name to send to cor
                 "author":message["author"]["username"],
                 "content":message["content"],
                 "id":message["id"],
-                "timestamp":message["timestamp"]
+                "timestamp":message["timestamp"],
+                "type":message["type"]
             }
             
             if len(message["attachments"]) > 0:   
                 newMsg["images"] = message["attachments"]
+            if message["type"] == 19:
+                try:
+                    newMsg["reply"] = message[""]
+                except:
+                    newMsg["reply"] = "not-fetched"
             returned.append(newMsg)
         socketio.emit("openDM", returned, room=request.sid)
 
@@ -115,7 +121,7 @@ def removeClient(data):
 
 
 if (__name__ == '__main__'):
-    socketio.run(app, host='0.0.0.0', port='5001')
+    socketio.run(app, host='0.0.0.0', port='2000')
     
     
 socketio.emit("Starting", {'data':'test'})

@@ -244,7 +244,13 @@ body {
   }
 }
 
+.self-reply{
+  margin-left: 0px !important;
+}
 
+.reply {
+  margin-right: 0px !important;
+}
 
 </style>
 </head>
@@ -282,22 +288,38 @@ body {
   
   
 
-<div class="chat-container">
+<div class="chat-container" style="">
 
 
   <div class="chat-messages" id="messageBox">
     <div style="width:100%; font-size:30px; font-weight:bold; text-align: center; color:#2E3440; display:none;" id="instructions">Select a DM.</div>
-    <!-- <div class="chat-message-container">
+    <div class="chat-message-container">
       <div class="author">anklebowl</div>
         <div class="chat-message">Hi there! How can I help you today?</div>
     </div>
     <div class="chat-message-container-self">
-        <div class="chat-message self">I'm looking for information on your products.</div>
+      <div style="margin-right:30px;">
+        <div style="display:flex; align-items:flex-end; opacity:50%; justify-content: flex-end;">
+          <div class="chat-message" style="margin-right:5px;">Hi there! How can I help you today?</div>
+          <img src="{{url_for('static', filename='images/alt-reply.svg')}}" style="height:30px;">
+        </div>
+        <div style="width:100%; display:flex; justify-content: flex-end;">
+          <div class="chat-message reply" style="margin-right:0px;">I'm looking for information on your products.</div>
+        </div>
+      </div>
+      
     </div>
+    <div class="chat-message-container-reply">
+      <div style="margin-left:30px;">
 
-    <div class="chat-message-container">
-        <div class="chat-message">Example response message.</div>
-    </div> -->
+          <div style="display:flex; margin-left:5px; align-items:flex-end; opacity:50%;">
+            <img src="{{url_for('static', filename='images/reply.svg')}}" style="height:30px;">
+            <div class="chat-message self" style="margin-left:5px;">I'm looking for information on your products.</div>
+          </div>
+
+          <div class="chat-message self-reply">Example response message.</div>
+      </div>
+    </div>
   </div>
   <div class="chat-input-container" style="display:none;" id="inpt">
     <input type="text" class="chat-input" placeholder="Type your message here" id="messageBar" style="flex:0.9;">
